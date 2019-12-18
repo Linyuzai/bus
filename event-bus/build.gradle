@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group 'com.github.linyuzai'
+version '0.1.0'//20191217
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
