@@ -131,15 +131,15 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
     }
 
     @Override
-    public void publish(EventSource source) {
+    public void publish(EventSource source, Object... args) {
         if (isInitialized) {
             if (source == null) {
-                throw new EventBusException("Event is null");
+                throw new EventBusException("Event source is null");
             }
             List<EventPublisher> eps = publishers.stream()
                     .filter(it -> filterWithHandleException(it, source))
                     .collect(Collectors.toList());
-            eventStrategy.publish(source, eps);
+            eventStrategy.publish(eps, source, args);
         } else {
             throw new EventBusException("Event bus is not initialized");
         }

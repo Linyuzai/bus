@@ -41,4 +41,6 @@ public @interface EventPublish {
      * @return 创建事件时注入方法入参还是返回值
      */
     EventParamType paramType() default EventParamType.DEFAULT;
+
+    EventSchedule[] schedule() default {};
 }

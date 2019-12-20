@@ -14,5 +14,5 @@ public interface Bus<T, S extends Subscriber<T>, P extends Publisher<T>> {
 
     void unregister(P publisher);
 
-    void publish(T source);
+    void publish(T source, Object... args);
 }
