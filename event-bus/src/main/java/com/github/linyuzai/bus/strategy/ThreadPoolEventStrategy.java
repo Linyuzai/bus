@@ -50,7 +50,7 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
     }
 
     @Override
-    public void initialize() {
+    public void start() {
         logger.info("Initialize Event Strategy: ThreadPool");
         if (eventExecutor == null) {
             throw new EventBusException("Event executor is null");
@@ -58,7 +58,7 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
     }
 
     @Override
-    public void destroy() {
+    public void stop() {
         if (!eventExecutor.isShutdown()) {
             eventExecutor.shutdown();
         }

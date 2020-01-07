@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface EventStrategy {
 
-    void initialize();
+    void start();
 
-    void destroy();
+    void stop();
 
     void publish(List<EventPublisher> publishers, EventSource source, Object... args);
 

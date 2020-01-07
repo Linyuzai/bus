@@ -34,7 +34,7 @@ public class EventPublishAspect implements Ordered {
 
     public static final Object ILLEGAL_RETURN_VALUE = new Object();
 
-    @Value("${event-bus.aspect.order:0}")
+    @Value("${event-bus.aspect.order:#{T(java.lang.Integer).MAX_VALUE}}")
     private int order;
 
     @Autowired

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class EventBus implements Bus<EventSource, EventSubscriber, EventPublisher> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
-    private static EventBus bus = new EventBus();
+    private static final EventBus bus = new EventBus();
 
     private List<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
     private List<EventPublisher> publishers = new CopyOnWriteArrayList<>();
@@ -96,7 +96,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
             if (eventExceptionHandler == null) {
                 throw new EventBusException("Event Exception Handler is null");
             }
-            eventStrategy.initialize();
+            eventStrategy.start();
             isInitialized = true;
         }
     }
@@ -105,8 +105,10 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
     public synchronized void destroy() {
         if (isInitialized) {
             logger.info("Destroy Event Bus");
-            eventStrategy.destroy();
-            eventStrategy = null;
+            if (eventStrategy != null) {
+                eventStrategy.stop();
+                eventStrategy = null;
+            }
         }
     }
 
