@@ -4,6 +4,7 @@ import com.github.linyuzai.bus.core.EventBus;
 import com.github.linyuzai.bus.core.EventSource;
 import com.github.linyuzai.bus.enhance.annotation.*;
 import com.github.linyuzai.bus.enhance.condition.EventPublishCondition;
+import com.github.linyuzai.bus.enhance.configuration.EventBusProperties;
 import com.github.linyuzai.bus.enhance.type.EventParamType;
 import com.github.linyuzai.bus.enhance.type.OpportunityType;
 import com.github.linyuzai.bus.exception.EventBusException;
@@ -34,8 +35,11 @@ public class EventPublishAspect implements Ordered {
 
     public static final Object ILLEGAL_RETURN_VALUE = new Object();
 
-    @Value("${event-bus.aspect.order:#{T(java.lang.Integer).MAX_VALUE}}")
-    private int order;
+    //@Value("${event-bus.aspect.order:#{T(java.lang.Integer).MAX_VALUE}}")
+    //private int order;
+
+    @Autowired
+    private EventBusProperties properties;
 
     @Autowired
     private EventPublishCondition condition;
@@ -181,7 +185,7 @@ public class EventPublishAspect implements Ordered {
 
     @Override
     public int getOrder() {
-        return order;
+        return properties.getAspectOrder();
     }
 
     private static class EventHolder {

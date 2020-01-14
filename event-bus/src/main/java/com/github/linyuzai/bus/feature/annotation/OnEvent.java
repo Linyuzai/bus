@@ -11,4 +11,6 @@ import java.lang.annotation.*;
 public @interface OnEvent {
 
     Class<? extends EventSource>[] value();
+
+    boolean inherited() default false;
 }

@@ -17,4 +17,5 @@ public class TestEvent implements EventSource {
     public void setTest(String test) {
         this.test = test;
     }
+
 }

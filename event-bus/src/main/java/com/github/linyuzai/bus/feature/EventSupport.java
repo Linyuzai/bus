@@ -7,18 +7,6 @@ public interface EventSupport extends SupportChecker<EventSource> {
 
     @Override
     default boolean isSupport(EventSource source) {
-        Class<?> cls = getClass();
-        OnEvent oe = cls.getAnnotation(OnEvent.class);
-        if (oe == null) {
-            return false;
-        }
-        Class<? extends EventSource>[] ess = oe.value();
-        Class<? extends EventSource> target = source.getClass();
-        for (Class<? extends EventSource> es : ess) {
-            if (es.isAssignableFrom(target)) {
-                return true;
-            }
-        }
-        return false;
+        return EventBusFeature.isSupport(this.getClass(), source.getClass());
     }
 }

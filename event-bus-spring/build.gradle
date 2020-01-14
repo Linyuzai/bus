@@ -1,16 +1,38 @@
-plugins {
-    id 'org.springframework.boot' version '2.2.2.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-    id 'java'
+buildscript {
+    ext {
+        springBootVersion = '2.1.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        //classpath("com.google.code.findbugs:findbugs:3.0.0")
+        //classpath("net.sourceforge.pmd:pmd:6.17.0")
+    }
 }
 
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+/*plugins {
+    //id 'org.springframework.boot' version '2.2.2.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+}*/
+
 group = 'com.github.linyuzai'
-version = '0.2.1'//20200107
+version = '0.2.2'//20200114
 sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
 }
+
+jar.enabled = true
+bootJar.enabled = false
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
@@ -18,6 +40,8 @@ dependencies {
     implementation 'com.googlecode.aviator:aviator:4.2.7'
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
     //implementation project(':event-bus')
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

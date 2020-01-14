@@ -3,6 +3,7 @@ package com.github.linyuzai.bus.core;
 import com.github.linyuzai.bus.Bus;
 import com.github.linyuzai.bus.exception.EventBusException;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
+import com.github.linyuzai.bus.feature.EventBusFeature;
 import com.github.linyuzai.bus.feature.SupportChecker;
 import com.github.linyuzai.bus.strategy.EventStrategy;
 import org.slf4j.Logger;
@@ -114,22 +115,38 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
 
     @Override
     public void register(EventSubscriber subscriber) {
+        if (subscriber == null) {
+            throw new EventBusException("Event Subscriber is null");
+        }
         subscribers.add(subscriber);
+        EventBusFeature.add(subscriber.getClass());
     }
 
     @Override
     public void unregister(EventSubscriber subscriber) {
+        if (subscriber == null) {
+            throw new EventBusException("Event Subscriber is null");
+        }
         subscribers.remove(subscriber);
+        EventBusFeature.remove(subscriber.getClass());
     }
 
     @Override
     public void register(EventPublisher publisher) {
+        if (publisher == null) {
+            throw new EventBusException("Event Publisher is null");
+        }
         publishers.add(publisher);
+        EventBusFeature.add(publisher.getClass());
     }
 
     @Override
     public void unregister(EventPublisher publisher) {
+        if (publisher == null) {
+            throw new EventBusException("Event Publisher is null");
+        }
         publishers.remove(publisher);
+        EventBusFeature.remove(publisher.getClass());
     }
 
     @Override

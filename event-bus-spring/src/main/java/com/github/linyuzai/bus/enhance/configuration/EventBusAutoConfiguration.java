@@ -7,9 +7,11 @@ import com.github.linyuzai.bus.exception.Slf4jEventExceptionHandler;
 import com.github.linyuzai.bus.strategy.EventStrategy;
 import com.github.linyuzai.bus.strategy.ThreadPoolEventStrategy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-public class EventBusConfiguration {
+@EnableConfigurationProperties(EventBusProperties.class)
+public class EventBusAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(EventStrategy.class)
