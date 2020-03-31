@@ -32,7 +32,6 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         this(DEFAULT_THREADS);
     }
 
-
     public ThreadPoolEventStrategy(int nThreads) {
         this(Executors.newScheduledThreadPool(nThreads));
     }
@@ -49,9 +48,17 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         this.eventExecutor = eventExecutor;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void startLogger() {
+        getLogger().info("Initialize Event Strategy: " + getClass().getSimpleName());
+    }
+
     @Override
     public void start() {
-        logger.info("Initialize Event Strategy: ThreadPool");
+        startLogger();
         if (eventExecutor == null) {
             throw new EventBusException("Event executor is null");
         }
@@ -66,8 +73,8 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
 
     @Override
     public void publish(List<EventPublisher> publishers, EventSource source, Object... args) {
-        List<Object> filterArgs = filterArgs(args);
-        if (filterArgs.isEmpty()) {
+        List<Object> scheduleArgs = filterScheduleArgs(args);
+        if (scheduleArgs.isEmpty()) {
             if (source instanceof DelaySupport) {
                 long d = ((DelaySupport) source).getDelay();
                 TimeUnit t = ((DelaySupport) source).getTimeUnit();
@@ -91,24 +98,24 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         } else {
             if (eventExecutor instanceof ScheduledExecutorService) {
                 ScheduledExecutorService ses = (ScheduledExecutorService) eventExecutor;
-                for (Object filterArg : filterArgs) {
-                    if (filterArg instanceof Delay) {
-                        long d = ((Delay) filterArg).getDelay();
-                        TimeUnit t = ((Delay) filterArg).getTimeUnit();
+                for (Object scheduleArg : scheduleArgs) {
+                    if (scheduleArg instanceof Delay) {
+                        long d = ((Delay) scheduleArg).getDelay();
+                        TimeUnit t = ((Delay) scheduleArg).getTimeUnit();
                         publishers.forEach(it ->
                                 ses.schedule(() ->
                                         publishWithHandleException(it, source), d, t));
-                    } else if (filterArg instanceof FixedDelay) {
-                        long i = ((FixedDelay) filterArg).getInitialDelay();
-                        long d = ((FixedDelay) filterArg).getDelay();
-                        TimeUnit t = ((FixedDelay) filterArg).getTimeUnit();
+                    } else if (scheduleArg instanceof FixedDelay) {
+                        long i = ((FixedDelay) scheduleArg).getInitialDelay();
+                        long d = ((FixedDelay) scheduleArg).getDelay();
+                        TimeUnit t = ((FixedDelay) scheduleArg).getTimeUnit();
                         publishers.forEach(it ->
                                 ses.scheduleWithFixedDelay(() ->
                                         publishWithHandleException(it, source), i, d, t));
-                    } else if (filterArg instanceof FixedRate) {
-                        long i = ((FixedRate) filterArg).getInitialDelay();
-                        long p = ((FixedRate) filterArg).getPeriod();
-                        TimeUnit t = ((FixedRate) filterArg).getTimeUnit();
+                    } else if (scheduleArg instanceof FixedRate) {
+                        long i = ((FixedRate) scheduleArg).getInitialDelay();
+                        long p = ((FixedRate) scheduleArg).getPeriod();
+                        TimeUnit t = ((FixedRate) scheduleArg).getTimeUnit();
                         publishers.forEach(it ->
                                 ses.scheduleAtFixedRate(() ->
                                         publishWithHandleException(it, source), i, p, t));
@@ -123,13 +130,15 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         }
     }
 
-    private static List<Object> filterArgs(Object... args) {
-        return Arrays.stream(args)
-                .filter(it -> (it instanceof Delay || it instanceof FixedDelay || it instanceof FixedRate))
-                .collect(Collectors.toList());
+    public List<Object> filterScheduleArgs(Object... args) {
+        return Arrays.stream(args).filter(this::isArgSupport).collect(Collectors.toList());
     }
 
-    private void publishWithHandleException(EventPublisher eventPublisher, EventSource source) {
+    public boolean isArgSupport(Object arg) {
+        return arg instanceof Delay || arg instanceof FixedDelay || arg instanceof FixedRate;
+    }
+
+    public void publishWithHandleException(EventPublisher eventPublisher, EventSource source) {
         try {
             eventPublisher.onPublish(source);
         } catch (Throwable e) {

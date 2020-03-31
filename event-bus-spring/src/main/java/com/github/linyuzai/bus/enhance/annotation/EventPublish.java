@@ -43,4 +43,6 @@ public @interface EventPublish {
     EventParamType paramType() default EventParamType.DEFAULT;
 
     EventSchedule[] schedule() default {};
+
+    boolean sync() default false;
 }

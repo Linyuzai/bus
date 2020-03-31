@@ -11,13 +11,13 @@ import com.github.linyuzai.bus.exception.EventBusException;
 import com.github.linyuzai.bus.schedule.metadata.Delay;
 import com.github.linyuzai.bus.schedule.metadata.FixedDelay;
 import com.github.linyuzai.bus.schedule.metadata.FixedRate;
+import com.github.linyuzai.bus.sync.SyncSupport;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 
 import java.lang.reflect.Constructor;
@@ -34,9 +34,6 @@ import java.util.stream.Collectors;
 public class EventPublishAspect implements Ordered {
 
     public static final Object ILLEGAL_RETURN_VALUE = new Object();
-
-    //@Value("${event-bus.aspect.order:#{T(java.lang.Integer).MAX_VALUE}}")
-    //private int order;
 
     @Autowired
     private EventBusProperties properties;
@@ -87,7 +84,11 @@ public class EventPublishAspect implements Ordered {
                 if (holder.eventSource == null) {
                     throw new EventBusException("Creation opportunity must be 'BEFORE'");
                 }
-                EventBus.getInstance().publish(holder.eventSource, holder.schedules);
+                if (holder.sync) {
+                    EventBus.getInstance().publish(holder.eventSource, SyncSupport.FILTER);
+                } else {
+                    EventBus.getInstance().publish(holder.eventSource, holder.schedules);
+                }
                 iterable.remove();
             }
         }
@@ -103,7 +104,11 @@ public class EventPublishAspect implements Ordered {
             if (holder.eventSource == null) {
                 holder.eventSource = getEventSource(holder.eventPublish, method, args, value);
             }
-            EventBus.getInstance().publish(holder.eventSource, holder.schedules);
+            if (holder.sync) {
+                EventBus.getInstance().publish(holder.eventSource, SyncSupport.FILTER);
+            } else {
+                EventBus.getInstance().publish(holder.eventSource, holder.schedules);
+            }
         }
         return value;
     }
@@ -198,11 +203,14 @@ public class EventPublishAspect implements Ordered {
         private boolean isConditionalAtBefore;
         private boolean isPublishAtBefore;
 
+        private boolean sync;
+
         EventHolder(EventPublish eventPublish) {
             this.eventPublish = eventPublish;
             this.isCreationAtBefore = eventPublish.creationOpportunity() == OpportunityType.BEFORE;
             this.isConditionalAtBefore = eventPublish.conditionalOpportunity() == OpportunityType.BEFORE;
             this.isPublishAtBefore = eventPublish.publishOpportunity() == OpportunityType.BEFORE;
+            this.sync = eventPublish.sync();
             List<Object> scheduleList = new ArrayList<>();
             EventSchedule[] ess = eventPublish.schedule();
             for (EventSchedule es : ess) {
@@ -218,6 +226,9 @@ public class EventPublishAspect implements Ordered {
                 for (ScheduleFixedRate sr : srs) {
                     scheduleList.add(new FixedRate(sr.initialDelay(), sr.period(), sr.timeUnit()));
                 }
+            }
+            if (sync && !scheduleList.isEmpty()) {
+                throw new EventBusException("Sync is conflict with schedule");
             }
             this.schedules = scheduleList.toArray();
         }

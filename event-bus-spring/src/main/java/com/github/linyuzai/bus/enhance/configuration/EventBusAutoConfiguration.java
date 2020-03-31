@@ -4,8 +4,8 @@ import com.github.linyuzai.bus.enhance.condition.EventPublishCondition;
 import com.github.linyuzai.bus.enhance.condition.EventPublishConditionImpl;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
 import com.github.linyuzai.bus.exception.Slf4jEventExceptionHandler;
+import com.github.linyuzai.bus.strategy.CombinatorialEventStrategy;
 import com.github.linyuzai.bus.strategy.EventStrategy;
-import com.github.linyuzai.bus.strategy.ThreadPoolEventStrategy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ public class EventBusAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(EventStrategy.class)
     public EventStrategy eventStrategy() {
-        return new ThreadPoolEventStrategy();
+        return new CombinatorialEventStrategy();
     }
 
     @Bean
