@@ -36,6 +36,9 @@ public class EventPublishAspect implements Ordered {
     public static final Object ILLEGAL_RETURN_VALUE = new Object();
 
     @Autowired
+    private EventBus eventBus;
+
+    @Autowired
     private EventBusProperties properties;
 
     @Autowired
@@ -85,9 +88,9 @@ public class EventPublishAspect implements Ordered {
                     throw new EventBusException("Creation opportunity must be 'BEFORE'");
                 }
                 if (holder.sync) {
-                    EventBus.getInstance().publish(holder.eventSource, SyncSupport.FILTER);
+                    eventBus.publish(holder.eventSource, SyncSupport.FILTER);
                 } else {
-                    EventBus.getInstance().publish(holder.eventSource, holder.schedules);
+                    eventBus.publish(holder.eventSource, holder.schedules);
                 }
                 iterable.remove();
             }
@@ -105,9 +108,9 @@ public class EventPublishAspect implements Ordered {
                 holder.eventSource = getEventSource(holder.eventPublish, method, args, value);
             }
             if (holder.sync) {
-                EventBus.getInstance().publish(holder.eventSource, SyncSupport.FILTER);
+                eventBus.publish(holder.eventSource, SyncSupport.FILTER);
             } else {
-                EventBus.getInstance().publish(holder.eventSource, holder.schedules);
+                eventBus.publish(holder.eventSource, holder.schedules);
             }
         }
         return value;

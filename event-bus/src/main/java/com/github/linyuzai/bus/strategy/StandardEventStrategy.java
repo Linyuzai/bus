@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-public class CombinatorialEventStrategy extends ThreadPoolEventStrategy {
+public class StandardEventStrategy extends ThreadPoolEventStrategy {
 
-    private static final Logger logger = LoggerFactory.getLogger(CombinatorialEventStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(StandardEventStrategy.class);
 
-    public CombinatorialEventStrategy() {
+    public StandardEventStrategy() {
         super();
     }
 
-    public CombinatorialEventStrategy(int nThreads) {
+    public StandardEventStrategy(int nThreads) {
         super(nThreads);
     }
 
-    public CombinatorialEventStrategy(ExecutorService executor) {
+    public StandardEventStrategy(ExecutorService executor) {
         super(executor);
     }
 

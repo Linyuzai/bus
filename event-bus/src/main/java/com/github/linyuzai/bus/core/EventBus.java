@@ -3,7 +3,7 @@ package com.github.linyuzai.bus.core;
 import com.github.linyuzai.bus.Bus;
 import com.github.linyuzai.bus.exception.EventBusException;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
-import com.github.linyuzai.bus.feature.EventBusFeature;
+import com.github.linyuzai.bus.plugin.EventBusPlugin;
 import com.github.linyuzai.bus.feature.SupportChecker;
 import com.github.linyuzai.bus.strategy.EventStrategy;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public class EventBus implements Bus<EventSource, EventSubscriber, EventPublisher> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
-    private static final EventBus bus = new EventBus();
 
     private List<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
     private List<EventPublisher> publishers = new CopyOnWriteArrayList<>();
@@ -29,7 +28,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
 
     private EventPublisher publisher = new EventPublisher() {
         @Override
-        public void onPublish(EventSource source) {
+        public void onPublish(EventSource source) throws Throwable {
             subscribers.stream()
                     .filter(it -> filterWithHandleException(it, source))
                     .forEach(it -> onSubscribeWithHandleException(it, source));
@@ -40,10 +39,6 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
             return true;
         }
     };
-
-    public static EventBus getInstance() {
-        return bus;
-    }
 
     public List<EventSubscriber> getSubscribers() {
         return subscribers;
@@ -119,7 +114,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
             throw new EventBusException("Event Subscriber is null");
         }
         subscribers.add(subscriber);
-        EventBusFeature.add(subscriber.getClass());
+        EventBusPlugin.add(subscriber.getClass());
     }
 
     @Override
@@ -128,7 +123,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
             throw new EventBusException("Event Subscriber is null");
         }
         subscribers.remove(subscriber);
-        EventBusFeature.remove(subscriber.getClass());
+        EventBusPlugin.remove(subscriber.getClass());
     }
 
     @Override
@@ -137,7 +132,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
             throw new EventBusException("Event Publisher is null");
         }
         publishers.add(publisher);
-        EventBusFeature.add(publisher.getClass());
+        EventBusPlugin.add(publisher.getClass());
     }
 
     @Override
@@ -146,7 +141,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
             throw new EventBusException("Event Publisher is null");
         }
         publishers.remove(publisher);
-        EventBusFeature.remove(publisher.getClass());
+        EventBusPlugin.remove(publisher.getClass());
     }
 
     @Override
@@ -168,7 +163,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
         try {
             return supportChecker.isSupport(source);
         } catch (Throwable e) {
-            eventExceptionHandler.handleException(Thread.currentThread(), supportChecker, e);
+            eventExceptionHandler.handleException(e, source, supportChecker, Thread.currentThread());
             return false;
         }
     }
@@ -177,7 +172,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
         try {
             eventSubscriber.onSubscribe(source);
         } catch (Throwable e) {
-            eventExceptionHandler.handleException(Thread.currentThread(), eventSubscriber, e);
+            eventExceptionHandler.handleException(e, source, eventSubscriber, Thread.currentThread());
         }
     }
 }

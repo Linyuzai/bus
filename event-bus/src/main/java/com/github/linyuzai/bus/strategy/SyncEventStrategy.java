@@ -6,7 +6,7 @@ import com.github.linyuzai.bus.sync.SyncSupport;
 
 import java.util.List;
 
-public class SyncEventStrategy extends CombinatorialEventStrategy {
+public class SyncEventStrategy extends StandardEventStrategy {
 
     public SyncEventStrategy() {
         super(null);

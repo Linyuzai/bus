@@ -1,11 +1,12 @@
 package com.github.linyuzai.bus.enhance.configuration;
 
+import com.github.linyuzai.bus.core.EventBus;
 import com.github.linyuzai.bus.enhance.condition.EventPublishCondition;
 import com.github.linyuzai.bus.enhance.condition.EventPublishConditionImpl;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
 import com.github.linyuzai.bus.exception.Slf4jEventExceptionHandler;
-import com.github.linyuzai.bus.strategy.CombinatorialEventStrategy;
 import com.github.linyuzai.bus.strategy.EventStrategy;
+import com.github.linyuzai.bus.strategy.StandardEventStrategy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +15,15 @@ import org.springframework.context.annotation.Bean;
 public class EventBusAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean(EventBus.class)
+    public EventBus eventBus() {
+        return new EventBus();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(EventStrategy.class)
     public EventStrategy eventStrategy() {
-        return new CombinatorialEventStrategy();
+        return new StandardEventStrategy();
     }
 
     @Bean

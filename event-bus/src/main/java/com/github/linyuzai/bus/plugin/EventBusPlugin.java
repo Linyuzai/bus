@@ -1,4 +1,4 @@
-package com.github.linyuzai.bus.feature;
+package com.github.linyuzai.bus.plugin;
 
 import com.github.linyuzai.bus.core.EventSource;
 import com.github.linyuzai.bus.feature.annotation.OnEvent;
@@ -6,9 +6,9 @@ import com.github.linyuzai.bus.feature.annotation.OnEvent;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class EventBusFeature {
+public final class EventBusPlugin {
 
-    private static Map<String, Collection<Class<? extends EventSource>>> features = new ConcurrentHashMap<>();
+    private static Map<String, Collection<Class<? extends EventSource>>> EVENT_SOURCE_SUPPORT = new ConcurrentHashMap<>();
 
     public static void add(Class<?> cls) {
         if (cls == null) {
@@ -21,9 +21,9 @@ public final class EventBusFeature {
         Class<? extends EventSource>[] ess = oe.value();
         List<Class<? extends EventSource>> esl = Arrays.asList(ess);
         if (oe.inherited()) {
-            features.put(cls.getName(), esl);
+            EVENT_SOURCE_SUPPORT.put(cls.getName(), esl);
         } else {
-            features.put(cls.getName(), new HashSet<>(esl));
+            EVENT_SOURCE_SUPPORT.put(cls.getName(), new HashSet<>(esl));
         }
     }
 
@@ -31,14 +31,14 @@ public final class EventBusFeature {
         if (cls == null) {
             return;
         }
-        features.remove(cls.getName());
+        EVENT_SOURCE_SUPPORT.remove(cls.getName());
     }
 
     public static boolean isSupport(Class<?> cls, Class<? extends EventSource> target) {
         if (cls == null) {
             return false;
         }
-        Collection<Class<? extends EventSource>> esc = features.get(cls.getName());
+        Collection<Class<? extends EventSource>> esc = EVENT_SOURCE_SUPPORT.get(cls.getName());
         if (esc == null) {
             return false;
         }

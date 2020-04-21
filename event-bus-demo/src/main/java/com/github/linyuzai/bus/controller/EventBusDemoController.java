@@ -7,6 +7,7 @@ import com.github.linyuzai.bus.enhance.annotation.ScheduleDelay;
 import com.github.linyuzai.bus.enhance.type.EventParamType;
 import com.github.linyuzai.bus.enhance.type.OpportunityType;
 import com.github.linyuzai.bus.event.TestEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/event-bus-demo")
 public class EventBusDemoController {
 
+    @Autowired
+    private EventBus eventBus;
+
     @EventPublish(TestEvent.class)
     @GetMapping("/test1")
     public String testEventBus1(String test) {
@@ -25,7 +29,7 @@ public class EventBusDemoController {
 
     @GetMapping("/test2")
     public String testEventBus2(String test) {
-        EventBus.getInstance().publish(new TestEvent(test));
+        eventBus.publish(new TestEvent(test));
         return test;
     }
 

@@ -1,6 +1,8 @@
 package com.github.linyuzai.bus.exception;
 
+import com.github.linyuzai.bus.core.EventSource;
+
 public interface EventExceptionHandler {
 
-    void handleException(Thread thread, Object object, Throwable e);
+    void handleException(Throwable e, EventSource source, Object object, Thread thread);
 }

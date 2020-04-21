@@ -16,6 +16,9 @@ public class EventBusInitializer implements ApplicationRunner, ApplicationListen
     private static final Logger logger = LoggerFactory.getLogger(EventBusInitializer.class);
 
     @Autowired
+    private EventBus eventBus;
+
+    @Autowired
     private EventStrategy eventStrategy;
 
     @Autowired
@@ -23,15 +26,15 @@ public class EventBusInitializer implements ApplicationRunner, ApplicationListen
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        EventBus.getInstance().setEventStrategy(eventStrategy);
-        EventBus.getInstance().setEventExceptionHandler(eventExceptionHandler);
-        EventBus.getInstance().initialize();
+        eventBus.setEventStrategy(eventStrategy);
+        eventBus.setEventExceptionHandler(eventExceptionHandler);
+        eventBus.initialize();
         logger.info("Event Bus start running");
     }
 
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
-        EventBus.getInstance().destroy();
+        eventBus.destroy();
         logger.info("Event Bus stop running");
     }
 }

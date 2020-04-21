@@ -142,7 +142,7 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         try {
             eventPublisher.onPublish(source);
         } catch (Throwable e) {
-            getEventExceptionHandler().handleException(Thread.currentThread(), eventPublisher, e);
+            getEventExceptionHandler().handleException(e, source, eventPublisher, Thread.currentThread());
         }
     }
 }
