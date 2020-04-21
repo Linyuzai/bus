@@ -53,7 +53,7 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
     }
 
     public void startLogger() {
-        getLogger().info("Initialize Event Strategy: " + getClass().getSimpleName());
+        getLogger().info("Initializing Event Strategy: " + getClass().getSimpleName());
     }
 
     @Override

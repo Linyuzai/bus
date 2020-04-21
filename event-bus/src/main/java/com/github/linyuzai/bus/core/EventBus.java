@@ -84,7 +84,7 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
     @Override
     public synchronized void initialize() {
         if (!isInitialized) {
-            logger.info("Initialize Event Bus");
+            logger.info("Initializing Event Bus");
             register(publisher);
             if (eventStrategy == null) {
                 throw new EventBusException("Event Strategy is null");
