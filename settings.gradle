@@ -1,2 +1,2 @@
 rootProject.name = 'bus'
-include 'event-bus','event-bus-spring'
+include 'event-bus','event-bus-spring','event-bus-demo'
