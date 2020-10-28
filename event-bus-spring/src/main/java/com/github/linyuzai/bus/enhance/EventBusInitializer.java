@@ -1,6 +1,7 @@
 package com.github.linyuzai.bus.enhance;
 
 import com.github.linyuzai.bus.core.EventBus;
+import com.github.linyuzai.bus.core.EventPublisher;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
 import com.github.linyuzai.bus.strategy.EventStrategy;
 import org.slf4j.Logger;
@@ -19,6 +20,9 @@ public class EventBusInitializer implements ApplicationRunner, ApplicationListen
     private EventBus eventBus;
 
     @Autowired
+    private EventPublisher eventPublisher;
+
+    @Autowired
     private EventStrategy eventStrategy;
 
     @Autowired
@@ -26,6 +30,7 @@ public class EventBusInitializer implements ApplicationRunner, ApplicationListen
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        eventBus.setEventPublisher(eventPublisher);
         eventBus.setEventStrategy(eventStrategy);
         eventBus.setEventExceptionHandler(eventExceptionHandler);
         eventBus.initialize();

@@ -108,6 +108,7 @@ public class EventPublishAspect implements Ordered {
                 holder.eventSource = getEventSource(holder.eventPublish, method, args, value);
             }
             if (holder.sync) {
+                //return value is ignore
                 eventBus.publish(holder.eventSource, SyncSupport.FILTER);
             } else {
                 eventBus.publish(holder.eventSource, holder.schedules);

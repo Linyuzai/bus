@@ -17,9 +17,6 @@ public class EventBeanPostProcessor implements BeanPostProcessor {
         if (bean instanceof EventSubscriber) {
             eventBus.register((EventSubscriber) bean);
         }
-        if (bean instanceof EventPublisher) {
-            eventBus.register((EventPublisher) bean);
-        }
         return bean;
     }
 }

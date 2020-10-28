@@ -5,4 +5,5 @@ import com.github.linyuzai.bus.feature.EventSupport;
 
 public interface EventPublisher extends Publisher<EventSource>, EventSupport {
 
+    void setEventBus(EventBus eventBus);
 }

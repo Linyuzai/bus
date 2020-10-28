@@ -4,8 +4,6 @@ import com.github.linyuzai.bus.core.EventPublisher;
 import com.github.linyuzai.bus.core.EventSource;
 import com.github.linyuzai.bus.sync.SyncSupport;
 
-import java.util.List;
-
 public class SyncEventStrategy extends StandardEventStrategy {
 
     public SyncEventStrategy() {
@@ -18,7 +16,7 @@ public class SyncEventStrategy extends StandardEventStrategy {
     }
 
     @Override
-    public void publish(List<EventPublisher> publishers, EventSource source, Object... args) {
-        super.publish(publishers, source, SyncSupport.FILTER);
+    public boolean publish(EventPublisher publisher, EventSource source, Object... args) {
+        return super.publish(publisher, source, SyncSupport.FILTER);
     }
 }

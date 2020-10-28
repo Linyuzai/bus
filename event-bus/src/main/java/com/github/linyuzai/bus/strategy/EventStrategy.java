@@ -13,7 +13,7 @@ public interface EventStrategy {
 
     void stop();
 
-    void publish(List<EventPublisher> publishers, EventSource source, Object... args);
+    boolean publish(EventPublisher publisher, EventSource source, Object... args);
 
     void setEventBus(EventBus eventBus);
 

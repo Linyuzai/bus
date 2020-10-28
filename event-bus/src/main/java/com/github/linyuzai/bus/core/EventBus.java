@@ -4,21 +4,20 @@ import com.github.linyuzai.bus.Bus;
 import com.github.linyuzai.bus.exception.EventBusException;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
 import com.github.linyuzai.bus.plugin.EventBusPlugin;
-import com.github.linyuzai.bus.feature.SupportChecker;
 import com.github.linyuzai.bus.strategy.EventStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
-public class EventBus implements Bus<EventSource, EventSubscriber, EventPublisher> {
+public class EventBus implements Bus<EventSource> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
 
     private List<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
-    private List<EventPublisher> publishers = new CopyOnWriteArrayList<>();
+
+    private EventPublisher eventPublisher;
 
     private EventStrategy eventStrategy;
 
@@ -26,26 +25,8 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
 
     private boolean isInitialized = false;
 
-    private EventPublisher publisher = new EventPublisher() {
-        @Override
-        public void onPublish(EventSource source) throws Throwable {
-            subscribers.stream()
-                    .filter(it -> filterWithHandleException(it, source))
-                    .forEach(it -> onSubscribeWithHandleException(it, source));
-        }
-
-        @Override
-        public boolean isSupport(EventSource source) {
-            return true;
-        }
-    };
-
     public List<EventSubscriber> getSubscribers() {
         return subscribers;
-    }
-
-    public List<EventPublisher> getPublishers() {
-        return publishers;
     }
 
     public boolean isInitialized() {
@@ -81,11 +62,17 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
         }
     }
 
-    @Override
+    public void setEventPublisher(EventPublisher eventPublisher) {
+        eventPublisher.setEventBus(this);
+        this.eventPublisher = eventPublisher;
+    }
+
     public synchronized void initialize() {
         if (!isInitialized) {
             logger.info("Initializing Event Bus");
-            register(publisher);
+            if (eventPublisher == null) {
+                throw new EventBusException("Event Publisher is null");
+            }
             if (eventStrategy == null) {
                 throw new EventBusException("Event Strategy is null");
             }
@@ -97,7 +84,6 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
         }
     }
 
-    @Override
     public synchronized void destroy() {
         if (isInitialized) {
             logger.info("Destroy Event Bus");
@@ -108,7 +94,6 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
         }
     }
 
-    @Override
     public void register(EventSubscriber subscriber) {
         if (subscriber == null) {
             throw new EventBusException("Event Subscriber is null");
@@ -117,7 +102,6 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
         EventBusPlugin.add(subscriber.getClass());
     }
 
-    @Override
     public void unregister(EventSubscriber subscriber) {
         if (subscriber == null) {
             throw new EventBusException("Event Subscriber is null");
@@ -127,52 +111,14 @@ public class EventBus implements Bus<EventSource, EventSubscriber, EventPublishe
     }
 
     @Override
-    public void register(EventPublisher publisher) {
-        if (publisher == null) {
-            throw new EventBusException("Event Publisher is null");
-        }
-        publishers.add(publisher);
-        EventBusPlugin.add(publisher.getClass());
-    }
-
-    @Override
-    public void unregister(EventPublisher publisher) {
-        if (publisher == null) {
-            throw new EventBusException("Event Publisher is null");
-        }
-        publishers.remove(publisher);
-        EventBusPlugin.remove(publisher.getClass());
-    }
-
-    @Override
     public void publish(EventSource source, Object... args) {
         if (isInitialized) {
             if (source == null) {
                 throw new EventBusException("Event source is null");
             }
-            List<EventPublisher> eps = publishers.stream()
-                    .filter(it -> filterWithHandleException(it, source))
-                    .collect(Collectors.toList());
-            eventStrategy.publish(eps, source, args);
+            eventStrategy.publish(eventPublisher, source, args);
         } else {
             throw new EventBusException("Event bus is not initialized");
-        }
-    }
-
-    private boolean filterWithHandleException(SupportChecker<EventSource> supportChecker, EventSource source) {
-        try {
-            return supportChecker.isSupport(source);
-        } catch (Throwable e) {
-            eventExceptionHandler.handleException(e, source, supportChecker, Thread.currentThread());
-            return false;
-        }
-    }
-
-    private void onSubscribeWithHandleException(EventSubscriber eventSubscriber, EventSource source) {
-        try {
-            eventSubscriber.onSubscribe(source);
-        } catch (Throwable e) {
-            eventExceptionHandler.handleException(e, source, eventSubscriber, Thread.currentThread());
         }
     }
 }

@@ -33,16 +33,16 @@ public class StandardEventStrategy extends ThreadPoolEventStrategy {
     }
 
     @Override
-    public void publish(List<EventPublisher> publishers, EventSource source, Object... args) {
+    public boolean publish(EventPublisher publisher, EventSource source, Object... args) {
         List<Object> syncArgs = filterSyncArgs(args);
         if (syncArgs.isEmpty()) {
             if (source instanceof SyncSupport) {
-                publish(publishers, source, SyncSupport.FILTER);
+                return publish(publisher, source, SyncSupport.FILTER);
             } else {
-                super.publish(publishers, source, args);
+                return super.publish(publisher, source, args);
             }
         } else {
-            publishers.forEach(it -> publishWithHandleException(it, source));
+            return publishWithHandleException(publisher, source);
         }
     }
 

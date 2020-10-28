@@ -9,7 +9,8 @@ public class Slf4jEventExceptionHandler implements EventExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(Slf4jEventExceptionHandler.class);
 
     @Override
-    public void handleException(Throwable e, EventSource source, Object object, Thread thread) {
+    public boolean handleException(Throwable e, EventSource source, Object object, Thread thread) {
         logger.error(source.getClass().getName(), e);
+        return false;
     }
 }

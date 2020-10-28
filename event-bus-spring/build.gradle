@@ -24,7 +24,7 @@ apply plugin: 'io.spring.dependency-management'
 }*/
 
 group = 'com.github.linyuzai'
-version = '0.3.1'//20200421
+version = '0.4.0'//20200610
 sourceCompatibility = '1.8'
 
 repositories {
