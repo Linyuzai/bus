@@ -1,6 +1,6 @@
 package com.github.linyuzai.bus.enhance.condition;
 
-import com.github.linyuzai.bus.enhance.EventPublishAspect;
+import com.github.linyuzai.bus.enhance.configuration.EventPublishAspect;
 import com.github.linyuzai.bus.enhance.annotation.EventPublish;
 import com.github.linyuzai.bus.exception.EventBusException;
 import com.googlecode.aviator.AviatorEvaluator;

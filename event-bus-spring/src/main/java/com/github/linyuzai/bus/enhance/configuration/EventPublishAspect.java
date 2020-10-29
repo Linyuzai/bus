@@ -1,4 +1,4 @@
-package com.github.linyuzai.bus.enhance;
+package com.github.linyuzai.bus.enhance.configuration;
 
 import com.github.linyuzai.bus.core.EventBus;
 import com.github.linyuzai.bus.core.EventSource;
