@@ -3,6 +3,7 @@ package com.github.linyuzai.bus.strategy;
 import com.github.linyuzai.bus.core.EventPublisher;
 import com.github.linyuzai.bus.core.EventSource;
 import com.github.linyuzai.bus.exception.EventBusException;
+import com.github.linyuzai.bus.exception.EventExceptionHandler;
 import com.github.linyuzai.bus.schedule.DelaySupport;
 import com.github.linyuzai.bus.schedule.FixedDelaySupport;
 import com.github.linyuzai.bus.schedule.FixedRateSupport;
@@ -136,7 +137,12 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         try {
             eventPublisher.onPublish(source);
         } catch (Throwable e) {
-            getEventExceptionHandler().handleException(e, source, eventPublisher, Thread.currentThread());
+            getExceptionHandler(source).handleException(e, source, eventPublisher, Thread.currentThread());
         }
+    }
+
+    private EventExceptionHandler getExceptionHandler(EventSource source) {
+        EventExceptionHandler handler = source.getExceptionHandler();
+        return handler == null ? getEventBus().getEventExceptionHandler() : handler;
     }
 }

@@ -7,8 +7,6 @@ public abstract class AbstractEventStrategy implements EventStrategy {
 
     private EventBus eventBus;
 
-    private EventExceptionHandler eventExceptionHandler;
-
     @Override
     public void setEventBus(EventBus eventBus) {
         this.eventBus = eventBus;
@@ -16,14 +14,5 @@ public abstract class AbstractEventStrategy implements EventStrategy {
 
     public EventBus getEventBus() {
         return eventBus;
-    }
-
-    @Override
-    public void setEventExceptionHandler(EventExceptionHandler handler) {
-        this.eventExceptionHandler = handler;
-    }
-
-    public EventExceptionHandler getEventExceptionHandler() {
-        return eventExceptionHandler;
     }
 }

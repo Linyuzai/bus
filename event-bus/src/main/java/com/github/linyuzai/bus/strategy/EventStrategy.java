@@ -16,6 +16,4 @@ public interface EventStrategy {
     void publish(EventPublisher publisher, EventSource source, Object... args);
 
     void setEventBus(EventBus eventBus);
-
-    void setEventExceptionHandler(EventExceptionHandler handler);
 }

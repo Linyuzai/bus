@@ -4,6 +4,7 @@ import com.github.linyuzai.bus.core.EventBus;
 import com.github.linyuzai.bus.core.EventPublisher;
 import com.github.linyuzai.bus.core.EventSource;
 import com.github.linyuzai.bus.core.EventSubscriber;
+import com.github.linyuzai.bus.exception.EventExceptionHandler;
 import com.github.linyuzai.bus.feature.SupportChecker;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class DefaultEventPublisher implements EventPublisher {
         try {
             return supportChecker.isSupport(source);
         } catch (Throwable e) {
-            eventBus.getEventExceptionHandler().handleException(e, source, supportChecker, Thread.currentThread());
+            getExceptionHandler(source).handleException(e, source, supportChecker, Thread.currentThread());
             return false;
         }
     }
@@ -40,7 +41,12 @@ public class DefaultEventPublisher implements EventPublisher {
         try {
             eventSubscriber.onSubscribe(source);
         } catch (Throwable e) {
-            eventBus.getEventExceptionHandler().handleException(e, source, eventSubscriber, Thread.currentThread());
+            getExceptionHandler(source).handleException(e, source, eventSubscriber, Thread.currentThread());
         }
+    }
+
+    private EventExceptionHandler getExceptionHandler(EventSource source) {
+        EventExceptionHandler handler = source.getExceptionHandler();
+        return handler == null ? eventBus.getEventExceptionHandler() : handler;
     }
 }

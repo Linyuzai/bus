@@ -43,9 +43,6 @@ public class EventBus implements Bus<EventSource> {
         }
         this.eventStrategy = eventStrategy;
         this.eventStrategy.setEventBus(this);
-        if (this.eventExceptionHandler != null) {
-            this.eventStrategy.setEventExceptionHandler(this.eventExceptionHandler);
-        }
     }
 
     public EventExceptionHandler getEventExceptionHandler() {
@@ -57,9 +54,6 @@ public class EventBus implements Bus<EventSource> {
             throw new EventBusException("Event Exception Handler can not be null");
         }
         this.eventExceptionHandler = eventExceptionHandler;
-        if (this.eventStrategy != null) {
-            eventStrategy.setEventExceptionHandler(eventExceptionHandler);
-        }
     }
 
     public void setEventPublisher(EventPublisher eventPublisher) {
