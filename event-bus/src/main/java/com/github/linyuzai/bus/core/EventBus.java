@@ -8,14 +8,14 @@ import com.github.linyuzai.bus.strategy.EventStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventBus implements Bus<EventSource> {
 
     private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
 
-    private List<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
+    private Collection<EventSubscriber> subscribers = new CopyOnWriteArrayList<>();
 
     private EventPublisher eventPublisher;
 
@@ -23,9 +23,9 @@ public class EventBus implements Bus<EventSource> {
 
     private EventExceptionHandler eventExceptionHandler;
 
-    private boolean isInitialized = false;
+    private volatile boolean isInitialized = false;
 
-    public List<EventSubscriber> getSubscribers() {
+    public Collection<EventSubscriber> getSubscribers() {
         return subscribers;
     }
 
@@ -92,6 +92,10 @@ public class EventBus implements Bus<EventSource> {
                 eventStrategy = null;
             }
         }
+    }
+
+    public void register(Collection<? extends EventSubscriber> subscribers) {
+        subscribers.forEach(this::register);
     }
 
     public void register(EventSubscriber subscriber) {

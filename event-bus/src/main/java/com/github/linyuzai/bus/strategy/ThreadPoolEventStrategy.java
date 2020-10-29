@@ -72,26 +72,26 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
     }
 
     @Override
-    public boolean publish(EventPublisher publisher, EventSource source, Object... args) {
+    public void publish(EventPublisher publisher, EventSource source, Object... args) {
         List<Object> scheduleArgs = filterScheduleArgs(args);
         if (scheduleArgs.isEmpty()) {
             if (source instanceof DelaySupport) {
                 long d = ((DelaySupport) source).getDelay();
                 TimeUnit t = ((DelaySupport) source).getTimeUnit();
                 Delay delay = new Delay(d, t);
-                return publish(publisher, source, delay);
+                publish(publisher, source, delay);
             } else if (source instanceof FixedDelaySupport) {
                 long i = ((FixedDelaySupport) source).getInitialDelay();
                 long d = ((FixedDelaySupport) source).getDelay();
                 TimeUnit t = ((FixedDelaySupport) source).getTimeUnit();
                 FixedDelay fixedDelay = new FixedDelay(i, d, t);
-                return publish(publisher, source, fixedDelay);
+                publish(publisher, source, fixedDelay);
             } else if (source instanceof FixedRateSupport) {
                 long i = ((FixedRateSupport) source).getInitialDelay();
                 long p = ((FixedRateSupport) source).getPeriod();
                 TimeUnit t = ((FixedRateSupport) source).getTimeUnit();
                 FixedRate fixedRate = new FixedRate(i, p, t);
-                return publish(publisher, source, fixedRate);
+                publish(publisher, source, fixedRate);
             } else {
                 eventExecutor.execute(() -> publishWithHandleException(publisher, source));
             }
@@ -122,7 +122,6 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
                 throw new EventBusException("Event executor not support schedule");
             }
         }
-        return true;
     }
 
     public List<Object> filterScheduleArgs(Object... args) {
@@ -133,11 +132,11 @@ public class ThreadPoolEventStrategy extends AbstractEventStrategy {
         return arg instanceof Delay || arg instanceof FixedDelay || arg instanceof FixedRate;
     }
 
-    public boolean publishWithHandleException(EventPublisher eventPublisher, EventSource source) {
+    public void publishWithHandleException(EventPublisher eventPublisher, EventSource source) {
         try {
-            return eventPublisher.onPublish(source);
+            eventPublisher.onPublish(source);
         } catch (Throwable e) {
-            return getEventExceptionHandler().handleException(e, source, eventPublisher, Thread.currentThread());
+            getEventExceptionHandler().handleException(e, source, eventPublisher, Thread.currentThread());
         }
     }
 }

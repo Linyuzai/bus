@@ -16,7 +16,7 @@ public class SyncEventStrategy extends StandardEventStrategy {
     }
 
     @Override
-    public boolean publish(EventPublisher publisher, EventSource source, Object... args) {
-        return super.publish(publisher, source, SyncSupport.FILTER);
+    public void publish(EventPublisher publisher, EventSource source, Object... args) {
+        super.publish(publisher, source, SyncSupport.FILTER);
     }
 }
