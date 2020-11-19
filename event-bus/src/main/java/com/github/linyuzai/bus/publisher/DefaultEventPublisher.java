@@ -5,8 +5,9 @@ import com.github.linyuzai.bus.core.EventPublisher;
 import com.github.linyuzai.bus.core.EventSource;
 import com.github.linyuzai.bus.core.EventSubscriber;
 import com.github.linyuzai.bus.exception.EventExceptionHandler;
-import com.github.linyuzai.bus.feature.SupportChecker;
+import com.github.linyuzai.bus.group.Group;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,19 +21,26 @@ public class DefaultEventPublisher implements EventPublisher {
     }
 
     @Override
-    public void onPublish(EventSource source) throws Throwable {
+    public void onPublish(EventSource source, Group group) throws Throwable {
         List<EventSubscriber> subscribers = eventBus.getSubscribers().stream()
-                .filter(it -> filterWithHandleException(it, source)).collect(Collectors.toList());
+                .filter(it -> filterWithHandleException(it, source, group)).collect(Collectors.toList());
         for (EventSubscriber subscriber : subscribers) {
             onSubscribeWithHandleException(subscriber, source);
         }
     }
 
-    private boolean filterWithHandleException(SupportChecker<EventSource> supportChecker, EventSource source) {
+    private boolean filterWithHandleException(EventSubscriber eventSubscriber, EventSource source, Group group) {
         try {
-            return supportChecker.isSupport(source);
+            Collection<String> groupSet = group.getGroups();
+            switch (group.getType()) {
+                case INCLUDE:
+                    return groupSet.contains(eventSubscriber.group()) && eventSubscriber.isSupport(source);
+                case EXCLUDE:
+                    return (!groupSet.contains(eventSubscriber.group())) && eventSubscriber.isSupport(source);
+            }
+            return false;
         } catch (Throwable e) {
-            getExceptionHandler(source).handleException(e, source, supportChecker, Thread.currentThread());
+            getExceptionHandler(source).handleException(e, source, eventSubscriber, Thread.currentThread());
             return false;
         }
     }

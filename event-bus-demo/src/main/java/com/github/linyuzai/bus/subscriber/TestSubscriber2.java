@@ -8,10 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @OnEvent(TestEvent.class)
-public class TestSubscriber implements EventSubscriber {
+public class TestSubscriber2 implements EventSubscriber {
 
     @Override
     public void onSubscribe(EventSource eventSource) {
-        System.out.println(Thread.currentThread() + " => " + ((TestEvent) eventSource).getTest() + "(1)");
+        System.out.println(Thread.currentThread() + " => " + ((TestEvent) eventSource).getTest() + "(2)");
+    }
+
+    @Override
+    public String group() {
+        return "2";
     }
 }

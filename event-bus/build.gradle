@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.github.linyuzai'
-version '0.5.0'//20201029
+version '0.6.0'//20201119
 
 sourceCompatibility = 1.8
 

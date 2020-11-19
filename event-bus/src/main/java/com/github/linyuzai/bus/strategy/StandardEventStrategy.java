@@ -6,6 +6,7 @@ import com.github.linyuzai.bus.sync.SyncSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -37,12 +38,14 @@ public class StandardEventStrategy extends ThreadPoolEventStrategy {
         List<Object> syncArgs = filterSyncArgs(args);
         if (syncArgs.isEmpty()) {
             if (source instanceof SyncSupport) {
-                publish(publisher, source, SyncSupport.FILTER);
+                List<Object> newArgs = new ArrayList<>(Arrays.asList(args));
+                newArgs.add(SyncSupport.FILTER);
+                publish(publisher, source, newArgs.toArray());
             } else {
                 super.publish(publisher, source, args);
             }
         } else {
-            publishWithHandleException(publisher, source);
+            publishWithHandleException(publisher, source, args);
         }
     }
 
